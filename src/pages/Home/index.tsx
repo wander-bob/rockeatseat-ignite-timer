@@ -18,15 +18,25 @@ export function Home() {
           <TaskInput
             type="text"
             id="task"
+            list="task-suggestions"
             placeholder="Dê um nome para o seu projeto"
           />
+
+          <datalist id="task-suggestions">
+            <option value="Projeto 1" />
+            <option value="Projeto 2" />
+            <option value="Projeto 3" />
+            <option value="Go away, punk" />
+          </datalist>
 
           <label htmlFor="">durante</label>
           <MinutesAmountInput
             type="number"
-            name=""
             id="minutesAmount"
             placeholder="00"
+            step={5}
+            min={5}
+            max={60}
           />
 
           <span>minutos.</span>
