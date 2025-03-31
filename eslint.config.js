@@ -41,6 +41,15 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      "prettier/prettier": [
+        "error",
+        {
+          printWidth: 100,
+          endOfLine: 'auto',
+          singleQuote: true
+        }
+      ],
+      // "quotes": ["error", "single", "always"]
     },
   },
 )
