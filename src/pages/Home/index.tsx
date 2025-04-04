@@ -1,4 +1,6 @@
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z as zod } from 'zod';
 
 import { Play } from 'phosphor-react';
 import {
@@ -11,20 +13,30 @@ import {
   TaskInput,
 } from './styles';
 
-interface TaskProps {
-  task: string;
-  minutesAmout: number;
-}
+const newCycleFormValidationSchema = zod.object({
+  task: zod.string().min(1, 'Informe a tarefa'),
+  minutesAmount: zod.number().min(5).max(60),
+});
+
+type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 export function Home() {
-  const { register, handleSubmit, watch } = useForm<TaskProps>();
+  const { register, handleSubmit, watch } = useForm<NewCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  });
 
   const task = watch('task');
   const isSubmitDisabled = !task;
 
-  function handleCreateNewCycle(data: TaskProps) {
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    console.log('teste');
     console.log(data);
   }
+
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)}>
@@ -45,7 +57,7 @@ export function Home() {
             <option value="Go away, punk" />
           </datalist>
 
-          <label htmlFor="">durante</label>
+          <label htmlFor="minutesAmount">durante</label>
           <MinutesAmountInput
             type="number"
             id="minutesAmount"
@@ -53,7 +65,7 @@ export function Home() {
             step={5}
             min={5}
             max={60}
-            {...register('minutesAmout', { valueAsNumber: true })}
+            {...register('minutesAmount', { valueAsNumber: true })}
           />
 
           <span>minutos.</span>
