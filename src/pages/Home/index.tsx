@@ -4,7 +4,8 @@ import { z as zod } from 'zod';
 import { differenceInSeconds } from 'date-fns';
 import { useEffect, useState } from 'react';
 
-import { Play } from 'phosphor-react';
+import { Play, HandPalm } from 'phosphor-react';
+
 import {
   CountdownContainer,
   FormContainer,
@@ -12,6 +13,7 @@ import {
   MinutesAmountInput,
   Separator,
   StartCountdownButton,
+  StopCountdownButton,
   TaskInput,
 } from './styles';
 
@@ -27,6 +29,7 @@ interface Cycle {
   task: string;
   minutesAmount: number;
   startDate: Date;
+  interruptedDate?: Date;
 }
 
 export function Home() {
@@ -61,6 +64,18 @@ export function Home() {
     reset();
   }
 
+  function handleInterruptCycle() {
+    setCycles(
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() };
+        }
+        return cycle;
+      }),
+    );
+    setActiveCycleId(null);
+  }
+
   useEffect(() => {
     let interval: number;
 
@@ -92,6 +107,8 @@ export function Home() {
 
   const task = watch('task');
   const isSubmitDisabled = !task;
+
+  console.log(cycles);
 
   return (
     <HomeContainer>
@@ -135,10 +152,17 @@ export function Home() {
           <span>{seconds[1]}</span>
         </CountdownContainer>
 
-        <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
-          <Play size={24} />
-          Começar
-        </StartCountdownButton>
+        {activeCycle ? (
+          <StopCountdownButton type="button" onClick={handleInterruptCycle}>
+            <HandPalm size={24} />
+            Começar
+          </StopCountdownButton>
+        ) : (
+          <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
+            <Play size={24} />
+            Começar
+          </StartCountdownButton>
+        )}
       </form>
     </HomeContainer>
   );
