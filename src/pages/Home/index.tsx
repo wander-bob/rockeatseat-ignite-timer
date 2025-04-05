@@ -30,6 +30,7 @@ interface Cycle {
   minutesAmount: number;
   startDate: Date;
   interruptedDate?: Date;
+  finishedDate?: Date;
 }
 
 export function Home() {
@@ -65,8 +66,8 @@ export function Home() {
   }
 
   function handleInterruptCycle() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (cycle.id === activeCycleId) {
           return { ...cycle, interruptedDate: new Date() };
         }
@@ -75,20 +76,6 @@ export function Home() {
     );
     setActiveCycleId(null);
   }
-
-  useEffect(() => {
-    let interval: number;
-
-    if (activeCycle) {
-      interval = setInterval(() => {
-        setAmountSecondsPassed(differenceInSeconds(new Date(), activeCycle.startDate));
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [activeCycle]);
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -99,16 +86,43 @@ export function Home() {
   const minutes = String(minutesAmount).padStart(2, '0');
   const seconds = String(secondsAmount).padStart(2, '0');
 
+  const task = watch('task');
+  const isSubmitDisabled = !task;
+
+  useEffect(() => {
+    let interval: number;
+
+    if (activeCycle) {
+      interval = setInterval(() => {
+        const secondsDifference = differenceInSeconds(new Date(), activeCycle.startDate);
+
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishedDate: new Date() };
+              }
+              return cycle;
+            }),
+          );
+          setAmountSecondsPassed(secondsDifference);
+          clearInterval(interval);
+        } else {
+          setAmountSecondsPassed(secondsDifference);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [activeCycle, totalSeconds, activeCycleId]);
+
   useEffect(() => {
     if (activeCycle) {
       document.title = `React Timer: ${minutes}:${seconds}`;
     }
   }, [minutes, seconds, activeCycle]);
-
-  const task = watch('task');
-  const isSubmitDisabled = !task;
-
-  console.log(cycles);
 
   return (
     <HomeContainer>
