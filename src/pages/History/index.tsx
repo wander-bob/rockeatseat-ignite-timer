@@ -1,9 +1,20 @@
 import { useContext } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
 import { HistoryContainer, HistoryList, Status } from './styles';
 import { CyclesContext } from '../../context/CyclesContext';
 
 export function History() {
   const { cycles } = useContext(CyclesContext);
+
+  function formatDate(startDate: Date) {
+    const text = formatDistanceToNow(startDate, {
+      addSuffix: true,
+      locale: ptBR,
+    });
+    const result = text.charAt(0).toUpperCase() + text.substring(1, text.length);
+    return result;
+  }
 
   return (
     <HistoryContainer>
@@ -22,8 +33,8 @@ export function History() {
             {cycles.map((cycle) => (
               <tr key={`id-${cycle.startDate.toISOString()}`}>
                 <td>{cycle.task}</td>
-                <td>${cycle.minutesAmount} Minutos</td>
-                <td>Há 2 minutos</td>
+                <td>{cycle.minutesAmount} minutos</td>
+                <td>{formatDate(cycle.startDate)}</td>
                 <td>
                   {cycle.finishedDate && <Status statusColor="green">Concluído</Status>}
                   {cycle.interruptedDate && <Status statusColor="red">Interrompido</Status>}
