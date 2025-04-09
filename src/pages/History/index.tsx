@@ -31,7 +31,7 @@ export function History() {
           </thead>
           <tbody>
             {cycles.map((cycle) => (
-              <tr key={`id-${cycle.startDate.toISOString()}`}>
+              <tr key={`id-${cycle.startDate}`}>
                 <td>{cycle.task}</td>
                 <td>{cycle.minutesAmount} minutos</td>
                 <td>{formatDate(cycle.startDate)}</td>
